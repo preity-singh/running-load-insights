@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import date
 from groq import Groq
 from dotenv import load_dotenv
@@ -44,12 +45,13 @@ def get_coaching_note(summary):
 
     try:
         response = client.chat.completions.create(
-            model="groq/compound-mini",
+            model="qwen/qwen3.8-27b",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
             max_tokens=500
         )
-        content = response.choices[0].message.content
+        content = response.choices[0].message.content or ''
+        content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL)
         if content and content.strip():
             return content.strip()
         return fallback

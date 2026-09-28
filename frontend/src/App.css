@@ -55,6 +55,78 @@
   transform: translateY(0);
 }
 
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.secondary-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--sans);
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.2s;
+}
+
+.secondary-btn:hover {
+  transform: translateY(-1px);
+}
+
+.landing-error {
+  max-width: 420px;
+  margin: 1.25rem 0 0;
+  color: #dc2626;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.export-steps {
+  max-width: 420px;
+  margin-top: 2rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.export-steps summary {
+  cursor: pointer;
+  text-align: center;
+  color: var(--text-h);
+  font-weight: 500;
+}
+
+.export-steps ol {
+  margin: 0.75rem 0 0.5rem;
+  padding-left: 1.25rem;
+}
+
+.export-steps p {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.link-btn {
+  margin-top: 1.5rem;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
 /* ─── Loading state ─── */
 .loading {
   display: flex;

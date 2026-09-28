@@ -1,6 +1,6 @@
 # Training Load Insights
 
-Connect your Strava to see how your running load has shifted over time, spot risky spikes before they become injuries, and get a personalized coaching note, all from your real data.
+Upload your Strava activity history to see how your running load has shifted over time, spot risky spikes before they become injuries, and get a personalized coaching note, all from your real data.
 
 ![Landing page](images/TitlePage.png)
 
@@ -46,9 +46,8 @@ The dashboard shows your current risk status, summary stats, an interactive ACWR
 ## How It Works
 
 ```
-User clicks "Connect with Strava"
-  → OAuth login via Strava
-  → Backend fetches activity history
+User uploads activities.csv from Strava's free data export (or tries the sample data)
+  → Backend parses runs from the export
   → Python computes weekly mileage, fills gaps, calculates ACWR per week
   → Groq LLM generates a coaching note from the pre-computed data
   → React dashboard displays risk summary, timeline chart, and note
@@ -70,11 +69,11 @@ Fully responsive and dark-mode compatible out of the box:
 
 ## Tech Stack
 
-- **Backend:** FastAPI (Python) — OAuth, pipeline orchestration
+- **Backend:** FastAPI (Python) — CSV parsing, pipeline orchestration
 - **Metrics:** Custom Python — weekly aggregation, gap-filling, EWMA-based ACWR with chronic floor
 - **LLM:** Groq — coaching note generation from pre-computed metrics
 - **Frontend:** React (Vite) + Recharts
-- **Deployment:** Vercel (frontend) + Railway (backend)
+- **Deployment:** Vercel Services (frontend + backend in one project, free Hobby plan)
 
 ## Running Locally
 
@@ -92,20 +91,21 @@ npm install
 npm run dev
 ```
 
-Copy `.env.example` to `.env` and fill in your credentials. Get Strava credentials at [strava.com/settings/api](https://www.strava.com/settings/api) and a free Groq key at [console.groq.com](https://console.groq.com).
+Vite proxies `/api/*` to the backend on port 8000, matching production routing. Alternatively, run both with `vercel dev` from the repo root.
+
+Copy `.env.example` to `.env` and add a free Groq key from [console.groq.com](https://console.groq.com).
 
 ## Deployment
 
-Frontend deploys to Vercel, backend to Railway — both auto-deploy on git push. Environment variables:
+One Vercel project deploys both services (see `vercel.json`): the React app serves `/` and FastAPI serves `/api/*` as a serverless function, so there's no always-on server to pay for or put to sleep. Auto-deploys on git push.
 
-- Backend (Railway): `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `GROQ_API_KEY`, `BACKEND_URL`, `FRONTEND_URL`
-- Frontend (Vercel): `VITE_BACKEND_URL`
-
-Strava's Authorization Callback Domain points to the Railway domain.
+Environment variable: `GROQ_API_KEY`.
 
 ## A Note on Strava API Access
 
-As of June 2026, Strava requires an active paid subscription for developer API access. This project was built and tested with a live subscription. The screenshots and recorded demo reflect the fully working app.
+As of June 2026, Strava requires an active paid subscription for developer API access. The app was originally built on the Strava OAuth API (tagged `strava-oauth-version`) and now uses Strava's free bulk data export instead.
+
+The OAuth flow is still in the code, switched off. To re-enable it, set `STRAVA_ENABLED=true`, `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `BACKEND_URL=https://<your-domain>/api` and `FRONTEND_URL=https://<your-domain>` on the backend, `VITE_STRAVA_ENABLED=true` on the frontend, and point Strava's Authorization Callback Domain to your Vercel domain.
 
 ## Why EWMA Over Rolling Average
 
@@ -130,7 +130,8 @@ TSB (Training Stress Balance) is what TrainingPeaks uses — it relies on power/
 ## What's Next
 
 - Strava API pagination for runners with 200+ activities
-- Persistence layer so users don't re-auth every visit
+- Persistence layer so users don't re-upload every visit
+- Garmin / GPX / FIT file support
 
 ---
 
