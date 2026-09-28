@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ReferenceArea } from 'recharts';
 
-function Dashboard({ data }) {
+function Dashboard({ data, onBack }) {
   const riskColors = {
     high: '#dc2626',
     moderate: '#d97706',
@@ -38,6 +38,9 @@ function Dashboard({ data }) {
 
   return (
     <div className="dashboard">
+      <button className="back-btn" onClick={onBack}>
+        &larr; Back
+      </button>
       <h1 className="dashboard-headline" style={{ color: riskColors[data.risk_level] }}>
         {riskLabels[data.risk_level] || data.risk_level}
       </h1>

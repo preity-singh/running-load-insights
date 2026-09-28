@@ -164,6 +164,26 @@
   }
 }
 
+/* ─── Back button ─── */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.back-btn:hover {
+  color: var(--accent);
+}
+
 /* ─── ACWR info toggle ─── */
 .acwr-info {
   margin-bottom: 1.5rem;

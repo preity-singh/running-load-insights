@@ -72,7 +72,7 @@ function App() {
         />
       )}
       {loading && <div className="loading"><p>Loading your dashboard...</p></div>}
-      {dashboardData && <Dashboard data={dashboardData} />}
+      {dashboardData && <Dashboard data={dashboardData} onBack={() => setDashboardData(null)} />}
       <footer className="site-footer">
         Built by <a href="https://www.linkedin.com/in/preity-singh/" target="_blank" rel="noopener noreferrer">Preity Singh</a>
         <span className="footer-sep">&middot;</span>
