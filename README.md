@@ -1,4 +1,4 @@
-# Training Load Insights
+# Running Load Insights
 
 Upload your Strava activity history to see how your running load has shifted over time, spot risky spikes before they become injuries, and get a personalized coaching note, all from your real data.
 

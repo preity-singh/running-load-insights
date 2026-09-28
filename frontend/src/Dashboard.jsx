@@ -22,7 +22,7 @@ function Dashboard({ data, onBack }) {
     return (
       <div className="chart-tooltip">
         <div className="chart-tooltip-header">{point.week}</div>
-        <div className="chart-tooltip-stats">ACWR: {point.acwr} — {point.risk}</div>
+        <div className="chart-tooltip-stats">ACWR: {point.acwr} ({point.risk})</div>
         <div className="chart-tooltip-detail">{point.acute_miles}mi this week / {point.chronic_avg_miles}mi avg</div>
         {point.runs && point.runs.length > 0 && (
           <div className="chart-tooltip-runs">
@@ -51,7 +51,7 @@ function Dashboard({ data, onBack }) {
         </button>
         {acwrOpen && (
           <p className="acwr-info-body">
-            ACWR (Acute:Chronic Workload Ratio) compares your current week's mileage to a weighted average of your recent weeks, where newer weeks count more than older ones (a method called EWMA, or Exponentially Weighted Moving Average). This reflects how fitness actually works — it builds up gradually and fades slowly, not all at once. A spike relative to your recent baseline flags injury risk.{' '}
+            ACWR (Acute:Chronic Workload Ratio) compares your current week's mileage to a weighted average of your recent weeks. Newer weeks count more than older ones (a method called EWMA, or Exponentially Weighted Moving Average). This reflects how fitness actually works. It builds up gradually and fades slowly, not all at once. A spike relative to your recent baseline flags injury risk.{' '}
             <a href="https://www.scienceforsport.com/acutechronic-workload-ratio/" target="_blank" rel="noopener noreferrer">Learn more</a>
           </p>
         )}
