@@ -2,7 +2,7 @@
 
 Upload your Strava history to see your injury risk week by week: how your running load has shifted over time, which weeks spiked too fast, and a personalized coaching note on what to do next.
 
-**Live app:** [strava-overtraining-detector.vercel.app](https://strava-overtraining-detector.vercel.app). Click "Try with sample data" to see it without uploading anything.
+**Live app:** [running-load-insights.vercel.app](https://running-load-insights.vercel.app). Click "Try with sample data" to see it without uploading anything.
 
 ![Home page](images/NewTitlePage.png)
 
@@ -175,7 +175,7 @@ The core of the app didn't change: the weekly mileage aggregation, the EWMA-base
 
 ### Restoring v1
 
-The v1 code is preserved at the [`strava-oauth-version`](https://github.com/preity-singh/strava-overtraining-detector/tree/strava-oauth-version) tag. The OAuth flow is also still in the current code, switched off. To re-enable it, set `STRAVA_ENABLED=true`, `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `BACKEND_URL=https://<your-domain>/api` and `FRONTEND_URL=https://<your-domain>` on the backend, `VITE_STRAVA_ENABLED=true` on the frontend, and point Strava's Authorization Callback Domain to your Vercel domain.
+The v1 code is preserved at the [`strava-oauth-version`](https://github.com/preity-singh/running-load-insights/tree/strava-oauth-version) tag. The OAuth flow is also still in the current code, switched off. To re-enable it, set `STRAVA_ENABLED=true`, `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `BACKEND_URL=https://<your-domain>/api` and `FRONTEND_URL=https://<your-domain>` on the backend, `VITE_STRAVA_ENABLED=true` on the frontend, and point Strava's Authorization Callback Domain to your Vercel domain.
 
 ## What's Next
 
