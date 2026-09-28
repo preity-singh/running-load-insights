@@ -75,6 +75,26 @@ Fully responsive and follows your system's light or dark mode:
 - **Frontend:** React (Vite) + Recharts
 - **Deployment:** Vercel Services (frontend + backend in one project, free Hobby plan)
 
+## Why EWMA Over Rolling Average
+
+The standard way to calculate ACWR uses a simple rolling average: add up the last 4 weeks and divide by 4. The problem is that week 5 data drops from full influence to zero overnight — a "cliff" that doesn't reflect how fitness actually works. Your body doesn't forget a 15-mile week the instant it's 29 days old.
+
+EWMA (Exponentially Weighted Moving Average) fixes this by decaying old weeks gradually:
+
+```
+chronic = (this_week × 0.4) + (previous_chronic × 0.6)
+```
+
+Each week, 40% of the weight goes to the new data and 60% carries forward from before. A big week from a month ago still contributes about 13% of its original influence (0.6⁴ ≈ 0.13) rather than disappearing entirely. This produces smoother, more realistic baselines — especially for runners with inconsistent schedules.
+
+### Chronic Floor (3.0 miles)
+
+Without a floor, the math breaks for low-volume runners. If someone averages 1 mile/week and then runs 3 miles, a pure ratio gives ACWR = 3.0 (extreme high risk) — but 3 miles isn't dangerous for anyone regardless of history. The chronic floor caps the denominator at 3.0 miles minimum, so the ratio stays grounded in reality when absolute mileage is too low to cause injury.
+
+## Why ACWR Over TSB
+
+TSB (Training Stress Balance) is what TrainingPeaks uses — it relies on power/pace zones and workout-level stress scores that require either a power meter or accurate pace data with a known fitness threshold. For casual runners tracking only distance and time, those inputs don't exist without calibration. ACWR works with raw mileage alone, making it accessible to any runner with a GPS watch or smartphone. The tradeoff is less precision at high performance levels, but for injury-risk detection in recreational runners, the spike-vs-baseline signal is what matters.
+
 ## Running Locally
 
 **Backend:**
@@ -156,26 +176,6 @@ The core of the app didn't change: the weekly mileage aggregation, the EWMA-base
 ### Restoring v1
 
 The v1 code is preserved at the [`strava-oauth-version`](https://github.com/preity-singh/strava-overtraining-detector/tree/strava-oauth-version) tag. The OAuth flow is also still in the current code, switched off. To re-enable it, set `STRAVA_ENABLED=true`, `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `BACKEND_URL=https://<your-domain>/api` and `FRONTEND_URL=https://<your-domain>` on the backend, `VITE_STRAVA_ENABLED=true` on the frontend, and point Strava's Authorization Callback Domain to your Vercel domain.
-
-## Why EWMA Over Rolling Average
-
-The standard way to calculate ACWR uses a simple rolling average: add up the last 4 weeks and divide by 4. The problem is that week 5 data drops from full influence to zero overnight — a "cliff" that doesn't reflect how fitness actually works. Your body doesn't forget a 15-mile week the instant it's 29 days old.
-
-EWMA (Exponentially Weighted Moving Average) fixes this by decaying old weeks gradually:
-
-```
-chronic = (this_week × 0.4) + (previous_chronic × 0.6)
-```
-
-Each week, 40% of the weight goes to the new data and 60% carries forward from before. A big week from a month ago still contributes about 13% of its original influence (0.6⁴ ≈ 0.13) rather than disappearing entirely. This produces smoother, more realistic baselines — especially for runners with inconsistent schedules.
-
-### Chronic Floor (3.0 miles)
-
-Without a floor, the math breaks for low-volume runners. If someone averages 1 mile/week and then runs 3 miles, a pure ratio gives ACWR = 3.0 (extreme high risk) — but 3 miles isn't dangerous for anyone regardless of history. The chronic floor caps the denominator at 3.0 miles minimum, so the ratio stays grounded in reality when absolute mileage is too low to cause injury.
-
-## Why ACWR Over TSB
-
-TSB (Training Stress Balance) is what TrainingPeaks uses — it relies on power/pace zones and workout-level stress scores that require either a power meter or accurate pace data with a known fitness threshold. For casual runners tracking only distance and time, those inputs don't exist without calibration. ACWR works with raw mileage alone, making it accessible to any runner with a GPS watch or smartphone. The tradeoff is less precision at high performance levels, but for injury-risk detection in recreational runners, the spike-vs-baseline signal is what matters.
 
 ## What's Next
 
