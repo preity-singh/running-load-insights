@@ -69,7 +69,7 @@ def compute_acwr(weekly_mileage, activities):
     for i, week in enumerate(weeks):
         acute = weekly_mileage[week]
 
-        chronic_ewma = (acute * ALPHA_CHRONIC) + (chronic_ewma * (1 - ALPHA_CHRONIC))
+        chronic_ewma = (acute * ALPHA_CHRONIC) + (chronic_ewma * (1 - ALPHA_CHRONIC)) # update chronic ewma
         chronic_ewma = max(chronic_ewma, CHRONIC_FLOOR)
 
         if i < 3:
@@ -78,7 +78,7 @@ def compute_acwr(weekly_mileage, activities):
         if acute == 0:
             continue
 
-        acwr = round(acute / chronic_ewma, 2)
+        acwr = round(acute / chronic_ewma, 2) # compute acwr
 
         if acwr >= 1.5:
             risk = 'High Risk'
