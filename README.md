@@ -1,8 +1,10 @@
 # Running Load Insights
 
-Upload your Strava activity history to see how your running load has shifted over time, spot risky spikes before they become injuries, and get a personalized coaching note, all from your real data.
+Upload your Strava history to see your injury risk week by week: how your running load has shifted over time, which weeks spiked too fast, and a personalized coaching note on what to do next.
 
-![Landing page](images/TitlePage.png)
+**Live app:** [strava-overtraining-detector.vercel.app](https://strava-overtraining-detector.vercel.app). Click "Try with sample data" to see it without uploading anything.
+
+![Home page](images/NewTitlePage.png)
 
 ## The Problem
 
@@ -39,9 +41,11 @@ Hover over any data point to see the ACWR value, risk band, mileage context, and
 
 The dashboard shows your current risk status, summary stats, an interactive ACWR timeline with labeled thresholds and a shaded Optimal zone, and an LLM-generated coaching note with forward-looking guidance.
 
-![Full dashboard view](images/UserPage.png)
+![Dashboard with sample data](images/NewSampleData.png)
 
-![Coaching note](images/CoachingNote.png)
+With my own Strava export:
+
+![Dashboard with my own running data](images/NewMeData.png)
 
 ## How It Works
 
@@ -57,14 +61,10 @@ The LLM never performs any calculation — it only narrates results that were al
 
 ## Dark Mode & Mobile
 
-Fully responsive and dark-mode compatible out of the box:
+Fully responsive and follows your system's light or dark mode:
 
 <p align="center">
-  <img src="images/TitlePagePhone.PNG" width="250" alt="Landing page on iPhone (dark mode)" />
-  &nbsp;&nbsp;
-  <img src="images/UserPagePhone.PNG" width="250" alt="Dashboard on iPhone (dark mode)" />
-  &nbsp;&nbsp;
-  <img src="images/CoachingNotePhone.PNG" width="250" alt="Coaching note on iPhone (dark mode)" />
+  <img src="images/NewTitlePhoneDark.jpg" width="280" alt="Home page on iPhone in dark mode" />
 </p>
 
 ## Tech Stack
@@ -101,11 +101,61 @@ One Vercel project deploys both services (see `vercel.json`): the React app serv
 
 Environment variable: `GROQ_API_KEY`.
 
-## A Note on Strava API Access
+## Project History: v1 → v2
 
-As of June 2026, Strava requires an active paid subscription for developer API access. The app was originally built on the Strava OAuth API (tagged `strava-oauth-version`) and now uses Strava's free bulk data export instead.
+### v1: Strava API + Railway
 
-The OAuth flow is still in the code, switched off. To re-enable it, set `STRAVA_ENABLED=true`, `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `BACKEND_URL=https://<your-domain>/api` and `FRONTEND_URL=https://<your-domain>` on the backend, `VITE_STRAVA_ENABLED=true` on the frontend, and point Strava's Authorization Callback Domain to your Vercel domain.
+The first version let runners click "Connect with Strava" and pulled their activities straight from the Strava API. The React frontend was hosted on Vercel and the FastAPI backend on Railway.
+
+```
+User clicks "Connect with Strava"
+  → OAuth login via Strava
+  → Backend fetches activity history
+  → Python computes weekly mileage, fills gaps, calculates ACWR per week
+  → Groq LLM generates a coaching note from the pre-computed data
+  → React dashboard displays risk summary, timeline chart, and note
+```
+
+This is what v1 looked like:
+
+![v1 landing page](images/TitlePage.png)
+
+![v1 full dashboard](images/UserPage.png)
+
+![v1 coaching note](images/CoachingNote.png)
+
+<p align="center">
+  <img src="images/TitlePagePhone.PNG" width="250" alt="v1 landing page on iPhone (dark mode)" />
+  &nbsp;&nbsp;
+  <img src="images/UserPagePhone.PNG" width="250" alt="v1 dashboard on iPhone (dark mode)" />
+  &nbsp;&nbsp;
+  <img src="images/CoachingNotePhone.PNG" width="250" alt="v1 coaching note on iPhone (dark mode)" />
+</p>
+
+### Why it changed
+
+I want this app to be free to run forever, and to never "fall asleep" the way free Streamlit or Render apps do. In September 2026, v1 stopped meeting that goal for two reasons:
+
+- **Railway's free trial ended**, so the backend had nowhere free to live.
+- **Strava put its API behind a paid subscription** (June 2026). "Connect with Strava" only works for developers with an active subscription.
+
+### v2: what it is now
+
+v2 is the version shown at the top of this README. Runners upload the `activities.csv` file from Strava's free data export (or try the built-in sample data), and the whole app runs as one free Vercel project. I also redesigned the home page and moved the app to a single, consistent style.
+
+| | v1 | v2 (current) |
+|---|---|---|
+| **Data source** | Strava OAuth API ("Connect with Strava") | Strava's free bulk export (`activities.csv` upload) + built-in sample data |
+| **Hosting** | Vercel (frontend) + Railway (backend) | One Vercel project using Vercel Services |
+| **Backend** | Always-on server on Railway | Serverless function: nothing to keep running, nothing to fall asleep |
+| **Cost** | Railway trial + paid Strava subscription | Free (Vercel Hobby plan, free Groq key) |
+| **LLM** | Groq `compound-mini` | Groq `qwen3.8-27b` (`compound-mini` was retired) |
+
+The core of the app didn't change: the weekly mileage aggregation, the EWMA-based ACWR with a chronic floor, the risk bands, and the "LLM narrates, never calculates" coaching note. The CSV parser converts Strava's export into the same shape the API used to return, so the metrics code runs unchanged on either source.
+
+### Restoring v1
+
+The v1 code is preserved at the [`strava-oauth-version`](https://github.com/preity-singh/strava-overtraining-detector/tree/strava-oauth-version) tag. The OAuth flow is also still in the current code, switched off. To re-enable it, set `STRAVA_ENABLED=true`, `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `BACKEND_URL=https://<your-domain>/api` and `FRONTEND_URL=https://<your-domain>` on the backend, `VITE_STRAVA_ENABLED=true` on the frontend, and point Strava's Authorization Callback Domain to your Vercel domain.
 
 ## Why EWMA Over Rolling Average
 
@@ -129,9 +179,7 @@ TSB (Training Stress Balance) is what TrainingPeaks uses — it relies on power/
 
 ## What's Next
 
-- Strava API pagination for runners with 200+ activities
-- Persistence layer so users don't re-upload every visit
-- Garmin / GPX / FIT file support
+**Account for elevation with Grade Adjusted Distance.** Right now ACWR counts every mile the same, but a hilly 3-mile run puts more strain on your body than a flat one. Strava's export already includes a Grade Adjusted Distance for each run: its estimate of what that run would equal on flat ground, based on the climbing and descending. Using it in place of raw distance would let hill-heavy weeks count as the extra load they really are, so a week of hill repeats can show up as a spike even when the mileage looks normal.
 
 ---
 
