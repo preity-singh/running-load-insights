@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import HeroChart from './HeroChart';
 
-function UploadPanel({ onUpload, onDemo, onConnect, error }) {
+function UploadPanel({ onUpload, onDemo, onConnect, hasSaved, onOpenSaved, onClearSaved, error }) {
   const fileInput = useRef(null);
 
   function handleFileChange(e) {
@@ -18,6 +18,15 @@ function UploadPanel({ onUpload, onDemo, onConnect, error }) {
           <p className="home-subtitle">
             Upload your Strava history to see your injury risk week by week.
           </p>
+
+          {hasSaved && (
+            <p className="saved-notice">
+              Your last upload is saved in this browser.{' '}
+              <button className="link-btn" onClick={onOpenSaved}>Open dashboard</button>
+              <span className="footer-sep">&middot;</span>
+              <button className="link-btn" onClick={onClearSaved}>Clear saved data</button>
+            </p>
+          )}
 
           <div className="home-actions">
             <button className="connect-btn" onClick={() => fileInput.current.click()}>
@@ -60,7 +69,7 @@ function UploadPanel({ onUpload, onDemo, onConnect, error }) {
           </li>
         </ol>
         <p className="export-note">
-          Your Strava language must be set to English when you export. Your file is only used to compute your results and is never stored.
+          Your Strava language must be set to English when you export. Your file is never stored on a server. Your results are saved only in this browser, and you can clear them any time.
         </p>
       </section>
     </main>

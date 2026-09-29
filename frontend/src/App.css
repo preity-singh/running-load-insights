@@ -549,3 +549,11 @@
 .footer-sep {
   margin: 0 0.4rem;
 }
+
+.saved-notice {
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+}
+.saved-notice .link-btn {
+  margin-top: 0;
+}

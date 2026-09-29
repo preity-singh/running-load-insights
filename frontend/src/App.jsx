@@ -8,13 +8,35 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '/api';
 // Strava API access now requires a paid subscription; set VITE_STRAVA_ENABLED=true to bring back "Connect with Strava"
 const STRAVA_ENABLED = import.meta.env.VITE_STRAVA_ENABLED === 'true';
 
+// Uploaded results are kept in this browser only (never sent anywhere for storage)
+const STORAGE_KEY = 'running-load-insights:analysis';
+
+function readSaved() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeSaved(data) {
+  try {
+    if (data) localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    else localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Storage full or blocked (e.g. private window): the dashboard still works, it just won't persist
+  }
+}
+
 function App() {
-  const [dashboardData, setDashboardData] = useState(null);
+  const [savedData, setSavedData] = useState(readSaved);
+  const [dashboardData, setDashboardData] = useState(savedData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const hasProcessed = useRef(false);
 
-  async function loadDashboard(request) {
+  async function loadDashboard(request, { persist = false } = {}) {
     setLoading(true);
     setError(null);
     try {
@@ -25,6 +47,10 @@ function App() {
       const data = await response.json();
       if (data.error) throw new Error(data.error);
       setDashboardData(data);
+      if (persist) {
+        writeSaved(data);
+        setSavedData(data);
+      }
     } catch (err) {
       setError(err instanceof SyntaxError ? 'Something went wrong. Please try again.' : err.message);
     } finally {
@@ -48,11 +74,16 @@ function App() {
       method: 'POST',
       headers: { 'Content-Type': 'text/csv' },
       body: file,
-    }));
+    }), { persist: true });
   }
 
   function handleDemo() {
     loadDashboard(fetch(`${BACKEND_URL}/demo`));
+  }
+
+  function handleClearSaved() {
+    writeSaved(null);
+    setSavedData(null);
   }
 
   async function handleConnect() {
@@ -68,6 +99,9 @@ function App() {
           onUpload={handleUpload}
           onDemo={handleDemo}
           onConnect={STRAVA_ENABLED ? handleConnect : null}
+          hasSaved={savedData !== null}
+          onOpenSaved={() => setDashboardData(savedData)}
+          onClearSaved={handleClearSaved}
           error={error}
         />
       )}
